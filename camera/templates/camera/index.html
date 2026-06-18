@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система видеонаблюдения</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Шапка с кнопками */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .header h1 {
+            font-size: 1.8em;
+            text-shadow: 0 0 10px rgba(0,255,255,0.5);
+        }
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
+            color: #000;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,255,255,0.4);
+        }
+        .btn-logout {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+        }
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255,65,108,0.4);
+        }
+        .user-info {
+            color: #00ffff;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .user-info::before {
+            content: "👤 ";
+            margin-right: 5px;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            align-items: start;
+        }
+        .video-container {
+            background: #000;
+            border: 3px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        .video-container img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .settings-panel {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .settings-panel h2 {
+            margin-bottom: 20px;
+            color: #00ffff;
+            font-size: 1.3em;
+            border-bottom: 2px solid #00ffff;
+            padding-bottom: 10px;
+        }
+        .setting-group {
+            margin-bottom: 20px;
+        }
+        .setting-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #aaa;
+            font-size: 0.9em;
+        }
+        .setting-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .setting-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #00ffff;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,255,255,0.5);
+        }
+        .setting-group input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid #444;
+            border-radius: 5px;
+            color: white;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        .setting-group input[type="number"]:focus {
+            outline: none;
+            border-color: #00ffff;
+        }
+        .value-display {
+            text-align: right;
+            color: #00ffff;
+            font-weight: bold;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        .apply-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
+            border: none;
+            border-radius: 5px;
+            color: #000;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,255,255,0.4);
+        }
+        .apply-btn:active {
+            transform: translateY(0);
+        }
+        .status-message {
+            text-align: center;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .status-message.show {
+            opacity: 1;
+        }
+        .status-message.success {
+            background: rgba(0,255,0,0.2);
+            color: #00ff00;
+        }
+        .status-message.error {
+            background: rgba(255,0,0,0.2);
+            color: #ff4444;
+        }
+        .info-text {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        .guest-notice {
+            background: rgba(255,193,7,0.1);
+            border: 1px solid rgba(255,193,7,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            color: #ffc107;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка с кнопками -->
+        <div class="header">
+            <h1>📹 Система видеонаблюдения</h1>
+            <div class="auth-buttons">
+                {% if user.is_authenticated %}
+                    <span class="user-info">{{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="btn btn-logout">Выйти</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-login">🔐 Войти</a>
+                    <a href="{% url 'register' %}" class="btn btn-login">📝 Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Уведомление для гостей -->
+        {% if not user.is_authenticated %}
+        <div class="guest-notice">
+            ⚠️ Гостевой режим: настройки сбрасываются после закрытия браузера.
+            <a href="{% url 'register' %}" style="color: #00ffff; text-decoration: underline;">Зарегистрируйтесь</a> для сохранения!
+        </div>
+        {% endif %}
+
+        <div class="main-content">
+            <div class="video-container">
+                <img src="{% url 'video_feed' %}" alt="Видеопоток">
+            </div>
+
+            <div class="settings-panel">
+                <h2>⚙️ Настройки детектора</h2>
+
+                <div class="setting-group">
+                    <label for="min_area">Минимальная площадь контура</label>
+                    <input type="range" id="min_area_slider" min="500" max="10000" step="100" value="{{ settings.min_area }}">
+                    <input type="number" id="min_area" name="min_area" value="{{ settings.min_area }}" min="500" max="10000">
+                    <div class="value-display">Текущее: <span id="min_area_value">{{ settings.min_area }}</span> px²</div>
+                    <div class="info-text">Чем больше значение, тем меньше ложных срабатываний.</div>
+                </div>
+
+                <div class="setting-group">
+                    <label for="threshold">Порог чувствительности</label>
+                    <input type="range" id="threshold_slider" min="10" max="100" step="5" value="{{ settings.threshold }}">
+                    <input type="number" id="threshold" name="threshold" value="{{ settings.threshold }}" min="10" max="100">
+                    <div class="value-display">Текущее: <span id="threshold_value">{{ settings.threshold }}</span></div>
+                    <div class="info-text">Меньше = чувствительнее (реагирует на тени).</div>
+                </div>
+
+                <div class="setting-group">
+                    <label for="stability_frames">Стабильность (кадров)</label>
+                    <input type="range" id="stability_frames_slider" min="1" max="10" step="1" value="{{ settings.stability_frames }}">
+                    <input type="number" id="stability_frames" name="stability_frames" value="{{ settings.stability_frames }}" min="1" max="10">
+                    <div class="value-display">Текущее: <span id="stability_frames_value">{{ settings.stability_frames }}</span> кадров</div>
+                    <div class="info-text">Сколько кадров подряд должно быть движение.</div>
+                </div>
+
+                <button class="apply-btn" onclick="applySettings()"> Применить настройки</button>
+                <div class="status-message" id="status_msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Синхронизация слайдеров и числовых полей
+        function syncInputs(sliderId, numberId, valueId) {
+            const slider = document.getElementById(sliderId);
+            const number = document.getElementById(numberId);
+            const value = document.getElementById(valueId);
+
+            slider.addEventListener('input', function() {
+                number.value = this.value;
+                value.textContent = this.value;
+            });
+
+            number.addEventListener('input', function() {
+                slider.value = this.value;
+                value.textContent = this.value;
+            });
+        }
+
+        syncInputs('min_area_slider', 'min_area', 'min_area_value');
+        syncInputs('threshold_slider', 'threshold', 'threshold_value');
+        syncInputs('stability_frames_slider', 'stability_frames', 'stability_frames_value');
+
+        // Применение настроек
+        function applySettings() {
+            const settings = {
+                min_area: parseInt(document.getElementById('min_area').value),
+                threshold: parseInt(document.getElementById('threshold').value),
+                stability_frames: parseInt(document.getElementById('stability_frames').value)
+            };
+
+            fetch('/update_settings/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showStatus('✅ Настройки применены!', 'success');
+            })
+            .catch(error => {
+                showStatus('❌ Ошибка: ' + error, 'error');
+            });
+        }
+
+        function showStatus(message, type) {
+            const msg = document.getElementById('status_msg');
+            msg.textContent = message;
+            msg.className = 'status-message show ' + type;
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 3000);
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
