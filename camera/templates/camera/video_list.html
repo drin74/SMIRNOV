@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загруженные видео</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        h1 { color: #00ffff; }
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .video-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: transform 0.2s;
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ffff;
+        }
+        .video-card h3 {
+            color: #00ffff;
+            margin-bottom: 10px;
+        }
+        .video-card p {
+            color: #aaa;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+        .video-card .actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+        }
+        .btn-analyze {
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            color: #000;
+        }
+        .empty {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        .messages {
+            margin-bottom: 20px;
+        }
+        .message {
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .message.success { background: rgba(0,255,0,0.2); color: #0f0; }
+        .message.error { background: rgba(255,0,0,0.2); color: #f44; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+    <h1>Загруженные видео</h1>
+    {% if user.is_authenticated %}
+    <a href="{% url 'upload_video' %}" class="btn">⬆ Загрузить видео</a>
+    {% endif %}
+</div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if videos %}
+        <div class="videos-grid">
+            {% for video in videos %}
+            <div class="video-card">
+                <h3>{{ video.title }}</h3>
+                <p> {{ video.uploaded_at|date:"d.m.Y H:i" }}</p>
+                <p> {{ video.get_file_size }}</p>
+                <p> {{ video.get_file_name }}</p>
+                {% if video.description %}
+                <p style="margin-top: 10px; font-style: italic;">{{ video.description|truncatewords:20 }}</p>
+                {% endif %}
+                <div class="actions">
+    {% if user.is_authenticated %}
+    <a href="{% url 'analyze_uploaded_video' video.pk %}" class="btn btn-small btn-analyze"> Анализ</a>
+    <a href="{% url 'delete_video' video.pk %}" class="btn btn-small btn-danger">Удалить</a>
+    {% endif %}
+    <a href="{% url 'video_detail' video.pk %}" class="btn btn-small">Смотреть</a>
+</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty">
+            <h2> Нет загруженных видео</h2>
+            <p>Загрузите первое видео!</p>
+            <a href="{% url 'upload_video' %}" class="btn" style="margin-top: 20px;">⬆ Загрузить</a>
+        </div>
+        {% endif %}
+
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="{% url 'index' %}" style="color: #00ffff;">← На главную</a>
+        </div>
+    </div>
+</body>
+</html>

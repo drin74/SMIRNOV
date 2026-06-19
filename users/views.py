@@ -1,4 +1,3 @@
-# users/views.py
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -10,10 +9,10 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, f"✅ Регистрация успешна! Добро пожаловать, {user.username}!")
+            messages.success(request, f"Регистрация успешна! Добро пожаловать, {user.username}!")
             return redirect('index')
         else:
-            # Показываем ошибки
+
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
@@ -30,10 +29,9 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, f"✅ С возвращением, {username}!")
+                messages.success(request, f"С возвращением, {username}!")
                 return redirect('index')
         else:
-            # Показываем ошибки входа
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, error)

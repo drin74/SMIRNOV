@@ -1,4 +1,3 @@
-# users/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -8,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
-        label='📧 Email',
+        label='Email',
         widget=forms.EmailInput(attrs={
             'placeholder': 'your@email.com'
         }),
@@ -19,9 +18,9 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2')
         labels = {
-            'username': '👤 Имя пользователя',
-            'password1': '🔑 Пароль',
-            'password2': '🔐 Подтверждение пароля',
+            'username': ' Имя пользователя',
+            'password1': ' Пароль',
+            'password2': 'Подтверждение пароля',
         }
         help_texts = {
             'username': 'Не более 150 символов. Только буквы, цифры и @/./+/-/_',
@@ -32,7 +31,7 @@ class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Добавляем стили и placeholder
+
         self.fields['username'].widget.attrs.update({
             'placeholder': 'Имя пользователя'
         })
@@ -43,7 +42,7 @@ class CustomUserCreationForm(UserCreationForm):
             'placeholder': 'Подтвердите пароль'
         })
 
-        # Перевод ошибок
+
         self.fields['username'].error_messages = {
             'required': 'Введите имя пользователя',
             'unique': 'Это имя уже занято',
@@ -68,11 +67,11 @@ class CustomUserCreationForm(UserCreationForm):
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
-        label='👤 Имя пользователя',
+        label='Имя пользователя',
         widget=forms.TextInput(attrs={'placeholder': 'Имя пользователя'})
     )
     password = forms.CharField(
-        label='🔑 Пароль',
+        label=' Пароль',
         widget=forms.PasswordInput(attrs={'placeholder': 'Пароль'})
     )
 

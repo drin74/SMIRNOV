@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ видео - {{ video.title }}</title>
+    <style>
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        h1 { color: #00ffff; }
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            display: inline-block;
+            transition: transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-success {
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+        .video-container {
+    background: transparent;
+    border: 3px solid #00ffff;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0 auto 20px auto;
+    padding: 0;
+    width: 100%;
+    max-width: 1000px;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+}
+.info-panel {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid #00ffff;  /* ← Голубая рамка */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0,255,255,0.2);  /* ← Свечение */
+}
+
+.video-container img {
+    width: 100%;
+    max-width: 1000px;
+    height: auto !important;
+    display: block;
+    margin: 0 auto;
+    padding: 0;
+    line-height: 0;
+        .info-panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        .info-panel h2 {
+            color: #00ffff;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #00ffff;
+            padding-bottom: 10px;
+        }
+        .info-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info-item label {
+            display: block;
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .info-item strong {
+            color: #00ffff;
+            font-size: 1.1em;
+        }
+        .legend {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .legend-red { background: #ff0000; }
+        .legend-green { background: #00ff00; }
+        .legend-text { color: #ccc; }
+        .settings-notice {
+            background: rgba(0,255,255,0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #00ffff;
+        }
+        @media (max-width: 968px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> Анализ видео: {{ video.title }}</h1>
+            <div>
+                <a href="{% url 'video_list' %}" class="btn">← К списку</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="video-container">
+                <img src="{% url 'analyze_video_stream' video.pk %}" alt="Анализ видео">
+            </div>
+
+            <div class="info-panel">
+                <h2>Информация</h2>
+
+                <div class="info-item">
+                    <label>Название:</label>
+                    <strong>{{ video.title }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <label>Файл:</label>
+                    <strong>{{ video.get_file_name }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <label>Размер:</label>
+                    <strong>{{ video.get_file_size }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <label>Загружено:</label>
+                    <strong>{{ video.uploaded_at|date:"d.m.Y H:i" }}</strong>
+                </div>
+
+                <div class="legend">
+                    <h3 style="margin-bottom: 10px; color: #00ffff;">Обозначения:</h3>
+                    <div class="legend-item">
+                        <div class="legend-color legend-red"></div>
+                        <div class="legend-text"> ДВИЖЕНИЕ обнаружено</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-green"></div>
+                        <div class="legend-text"> НЕТ движения</div>
+                    </div>
+                    <div class="legend-item">
+                        <div style="color: #0f0; margin-right: 10px;"></div>
+                        <div class="legend-text">Зеленый контур - область движения</div>
+                    </div>
+                </div>
+
+                <div class="settings-notice">
+                     Анализ производится с текущими настройками детектора.
+                    Измените их на главной странице для более точного анализа.
+                </div>
+
+                <form action="{% url 'save_analysis_result' video.pk %}" method="post" style="margin-top: 20px;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success" style="width: 100%;">
+                        Завершить анализ
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

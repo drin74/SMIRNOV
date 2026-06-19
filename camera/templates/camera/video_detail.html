@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ video.title }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .video-wrapper {
+            background: #000;
+            border: 3px solid #00ffff;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        video {
+            width: 100%;
+            max-height: 700px;
+            display: block;
+        }
+
+        .info-panel {
+            background: rgba(20, 30, 60, 0.9);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .info-panel h1 {
+            color: #00ffff;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .info-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .info-item .label {
+            color: #aaa;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            color: #00ffff;
+            font-size: 1em;
+            word-break: break-all;
+        }
+
+        .description {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .description .label {
+            color: #aaa;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        .description .value {
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
+            color: #000;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            color: #000;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'video_list' %}" class="back-link">← Назад к списку</a>
+
+        <div class="video-wrapper">
+            <video controls>
+                <source src="{{ video.video_file.url }}" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+        </div>
+
+        <div class="info-panel">
+            <h1>{{ video.title }}</h1>
+
+            <div class="info-item">
+                <div class="label"> Загружено:</div>
+                <div class="value">{{ video.uploaded_at|date:"d.m.Y H:i" }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="label"> Размер:</div>
+                <div class="value">{{ video.get_file_size }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="label"> Файл:</div>
+                <div class="value">{{ video.get_file_name }}</div>
+            </div>
+
+            {% if video.description %}
+            <div class="description">
+                <div class="label"> Описание:</div>
+                <div class="value">{{ video.description }}</div>
+            </div>
+            {% endif %}
+
+            <div class="actions">
+    {% if user.is_authenticated %}
+    <a href="{% url 'analyze_uploaded_video' video.pk %}" class="btn btn-success"> Анализировать</a>
+    <a href="{% url 'delete_video' video.pk %}" class="btn btn-danger">Удалить</a>
+    {% endif %}
+</div>
+        </div>
+    </div>
+</body>
+</html>
