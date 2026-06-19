@@ -136,7 +136,7 @@ def analyze_video_stream(request, pk):
 def save_analysis_result(request, pk):
 
     video = get_object_or_404(UploadedVideo, pk=pk, uploaded_by=request.user)
-    messages.success(request, f" Анализ видео '{video.title}' завершен!")
+    messages.success(request, f" Video analysis '{video.title}' completed!")
     return redirect('video_list')
 
 
@@ -167,7 +167,7 @@ class VideoCamera:
 
         if self.prev_frame is None:
             self.prev_frame = gray
-            cv2.putText(frame, "ИНИЦИАЛИЗАЦИЯ...", (180, 240),
+            cv2.putText(frame, "INITIALIZATION...", (180, 240),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
             ret, jpeg = cv2.imencode('.jpg', frame)
             return jpeg.tobytes()
@@ -302,7 +302,7 @@ def upload_video(request):
                     video = form.save(commit=False)
                     video.uploaded_by = request.user
                     video.save()
-                    messages.success(request, f'✅ Видео "{video.title}" успешно загружено!')
+                    messages.success(request, f'Видео "{video.title}" успешно загружено!')
                     return redirect('video_list')
         else:
             messages.error(request, 'Ошибка при загрузке. Проверьте данные.')
@@ -327,6 +327,6 @@ def delete_video(request, pk):
         if os.path.exists(video.video_file.path):
             os.remove(video.video_file.path)
         video.delete()
-        messages.success(request, '️ Видео удалено')
+        messages.success(request, '️Видео удалено')
         return redirect('video_list')
     return render(request, 'camera/video_confirm_delete.html', {'video': video})
